@@ -1,9 +1,10 @@
 package net.codingcatlady.azure.auth;
 
-import net.codingcatlady.azure.util.AzureJsonParser;
-import net.codingcatlady.azure.util.AzureJsonParserUnimplementedException;
+import net.codingcatlady.util.json.JsonCreatorUnimplementedException;
+import net.codingcatlady.util.json.JsonParser;
+import net.codingcatlady.util.json.JsonParserUnimplementedException;
 import net.codingcatlady.util.JavaCast;
-import net.codingcatlady.util.http.SimpleHttpPost;
+import net.codingcatlady.util.http.SimpleHttpFormPost;
 import net.codingcatlady.util.URLHelper;
 
 import java.io.IOException;
@@ -138,14 +139,14 @@ public class AuthenticationProvider {
         }
 
         // perform a simple post
-        SimpleHttpPost post = new SimpleHttpPost(urlText, body);
+        SimpleHttpFormPost post = new SimpleHttpFormPost(urlText, body);
 
         byte[] responseBytes = null;
 
         try {
             responseBytes = post.execute();
 
-        } catch (IOException e) {
+        } catch (IOException | JsonCreatorUnimplementedException e) {
             throw new RuntimeException(e);
         }
 
@@ -155,7 +156,7 @@ public class AuthenticationProvider {
 
         try {
             // parse responded JSON into a map
-            Object json = AzureJsonParser.getParser().parse(jsonText);
+            Object json = JsonParser.getParser().parse(jsonText);
 
             if (json instanceof Map) {
                 // convert response to auth token
@@ -165,7 +166,7 @@ public class AuthenticationProvider {
                 return token;
             }
 
-        } catch (AzureJsonParserUnimplementedException e) {
+        } catch (JsonParserUnimplementedException e) {
             throw new RuntimeException(e);
         }
 

@@ -1,6 +1,7 @@
 package net.codingcatlady.azure.auth;
 
 import net.codingcatlady.util.JavaCast;
+import net.codingcatlady.util.http.SimpleHttp;
 import net.codingcatlady.util.http.SimpleHttpGet;
 
 import java.util.Date;
@@ -81,8 +82,8 @@ public class AuthenticationToken {
      * Writes the auth header
      * @param http
      */
-    public void writeAuthHeader(SimpleHttpGet http) {
-        http.setAuthorizationHeader(this.tokenType + " " + this._accessToken);
+    public void writeAuthHeader(SimpleHttp http) {
+        http.setAuthHeader(this.tokenType + " " + this._accessToken);
     }
 
 
