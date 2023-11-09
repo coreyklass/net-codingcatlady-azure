@@ -3,7 +3,7 @@ package net.codingcatlady.azure.auth;
 import net.codingcatlady.azure.util.AzureJsonParser;
 import net.codingcatlady.azure.util.AzureJsonParserUnimplementedException;
 import net.codingcatlady.util.JavaCast;
-import net.codingcatlady.util.SimpleHttpPost;
+import net.codingcatlady.util.http.SimpleHttpPost;
 import net.codingcatlady.util.URLHelper;
 
 import java.io.IOException;
@@ -17,13 +17,13 @@ public class AuthenticationProvider {
     /**
      * Stores the auth URL
      */
-    static final String authUrl = "https://login.microsoftonline.com/{tenantID}/oauth2/v2.0/token";
+    static final String authUrl = "https://login.microsoftonline.com/{tenantID}/oauth2/token";
 
 
     /**
      * Stores the auth scope
      */
-    static final String scope = "https://graph.microsoft.com/.default";
+    static final String defaultScope = "https://graph.microsoft.com/.default";
 
 
     /**
@@ -97,20 +97,20 @@ public class AuthenticationProvider {
      * Builds and returns the auth body
      * @return
      */
-    private HashMap<Object, Object> _buildAuthBody() {
+    private HashMap<Object, Object> _buildAuthBody(String resource) {
         HashMap<Object, Object> params = new HashMap<>();
 
         params.put("client_id", this.clientID);
         params.put("client_secret", this._clientSecret);
         params.put("grant_type", AuthenticationProvider.grantType);
-        params.put("scope", AuthenticationProvider.scope);
+        params.put("scope", AuthenticationProvider.defaultScope);
+
+        if (resource != null) {
+            params.put("resource", resource);
+        }
 
         return params;
     }
-
-
-
-
 
 
     /**
@@ -118,9 +118,19 @@ public class AuthenticationProvider {
      * @return
      */
     public AuthenticationToken requestToken() {
+        return this.requestToken(null);
+    }
+
+
+
+    /**
+     * Requests an auth token
+     * @return
+     */
+    public AuthenticationToken requestToken(String resource) {
         // pull URL and body
         String urlText = this._buildAuthUrl();
-        HashMap<Object, Object> body = this._buildAuthBody();
+        HashMap<Object, Object> body = this._buildAuthBody(resource);
 
         // if either is NULL, return NULL
         if ((urlText == null) || (body == null)) {

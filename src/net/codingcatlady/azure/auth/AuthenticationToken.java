@@ -1,5 +1,8 @@
 package net.codingcatlady.azure.auth;
 
+import net.codingcatlady.util.JavaCast;
+import net.codingcatlady.util.http.SimpleHttpGet;
+
 import java.util.Date;
 import java.util.HashMap;
 
@@ -47,7 +50,7 @@ public class AuthenticationToken {
         this.tokenType = (String)json.get("token_type");
         this._accessToken = (String)json.get("access_token");
 
-        Integer expiresIn = (Integer)json.get("expires_in");
+        Integer expiresIn = JavaCast.toInteger(json.get("expires_in"));
         this.expiresIn = expiresIn.longValue();
 
         long expiresInMS = this.expiresIn * 1000;
@@ -70,6 +73,16 @@ public class AuthenticationToken {
         values.put("accessToken", this._accessToken.substring(0, 6));
 
         return values.toString();
+    }
+
+
+
+    /**
+     * Writes the auth header
+     * @param http
+     */
+    public void writeAuthHeader(SimpleHttpGet http) {
+        http.setAuthorizationHeader(this.tokenType + " " + this._accessToken);
     }
 
 

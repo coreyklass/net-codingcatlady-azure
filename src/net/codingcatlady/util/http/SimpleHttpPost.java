@@ -1,4 +1,7 @@
-package net.codingcatlady.util;
+package net.codingcatlady.util.http;
+
+import net.codingcatlady.util.JavaCast;
+import net.codingcatlady.util.URLHelper;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -9,12 +12,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Scanner;
 
-public class SimpleHttpPost {
-
-    /**
-     * Stores the URL text
-     */
-    public final String urlText;
+public class SimpleHttpPost extends SimpleHttpGet {
 
 
     /**
@@ -29,8 +27,9 @@ public class SimpleHttpPost {
      * @param urlText
      */
     public SimpleHttpPost(String urlText) {
-        this.urlText = urlText;
+        super(urlText);
     }
+
 
 
     /**
@@ -57,11 +56,17 @@ public class SimpleHttpPost {
     /**
      * Executes the HTTP post
      */
+    @Override
     public byte[] execute() throws IOException {
         // build the URL
         URL url = new URL(this.urlText);
 
         HttpURLConnection urlConnection = (HttpURLConnection)url.openConnection();
+
+        // set the auth header
+        if (this._authorizationHeader != null) {
+            urlConnection.setRequestProperty("Authorization", this._authorizationHeader);
+        }
 
         // set the POST method
         urlConnection.setRequestMethod("POST");
